@@ -23,6 +23,12 @@ def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[
 
     return results
 
+def get_table_download_link(df):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  
+    href = f'<a href="data:file/csv;base64,{b64}" download="differences.csv">Download Differences CSV</a>'
+    return href
+
 st.title('CSV File Pairwise Comparison Tool')
 st.write("""
 This app allows you to upload a CSV file and perform a pairwise comparison on the data.
@@ -53,18 +59,15 @@ if uploaded_file is not None:
         df = df.astype(str)
         results = pairwise_comparison(df, record_id_col, ignore_cols)
         
-        # Drop columns where all values are N/A
-        results = results.dropna(axis=1, how='all')
+        # Identify columns to drop (all N/A) except 'source'
+        cols_to_drop = results.columns[results.isna().all()].tolist()
+        if 'source' in cols_to_drop:
+            cols_to_drop.remove('source')
+        # Drop these columns
+        results = results.drop(columns=cols_to_drop)
 
         st.write("Differences:")
         st.write(results)
 
-        # Generate CSV for download
-        csv = results.to_csv(index=False).encode()
-        b64 = base64.b64encode(csv).decode()
-        st.sidebar.download_button(
-            label="Download differences as CSV",
-            data=b64,
-            file_name='differences.csv',
-            mime='text/csv',
-        )
+        # Provide link for download
+        st.sidebar.markdown(get_table_download_link(results), unsafe_allow_html=True)
