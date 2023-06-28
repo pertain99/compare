@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from typing import List
-import io
+import base64
 
 def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[str]) -> pd.DataFrame:
     df = df.sort_values(by=[record_id_col])
@@ -55,8 +55,12 @@ if uploaded_file is not None:
         st.write("Differences:")
         st.write(results)
 
-        # Add a download button for the results
-        csv = results.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()  # some strings
-        href = f'<a href="data:file/csv;base64,{b64}" download="differences.csv">Download Differences CSV File</a>'
-        st.markdown(href, unsafe_allow_html=True)
+        # Generate CSV for download
+        csv = results.to_csv(index=False).encode()
+        b64 = base64.b64encode(csv).decode()
+        st.download_button(
+            label="Download differences as CSV",
+            data=b64,
+            file_name='differences.csv',
+            mime='text/csv',
+        )
