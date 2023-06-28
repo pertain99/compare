@@ -20,11 +20,12 @@ def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[
                 if pd.api.types.is_numeric_dtype(pair[col]):
                     diffs[col] = abs(values[0] - values[1])
                 else:
-                    diffs[col] = values[0] != values[1]  # This will return a boolean value
+                    diffs[col] = None if values[0] == values[1] else (str(values[0]) + ' -> ' + str(values[1]))
 
         results = results.append(diffs, ignore_index=True)
 
     return results
+
 
 
 
