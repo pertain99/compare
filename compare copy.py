@@ -41,6 +41,10 @@ uploaded_file = st.sidebar.file_uploader("Choose a file", type=['csv'])
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
+    
+    # Sort by `RECORD_ID` and `source` before analysis
+    df = df.sort_values(by=['RECORD_ID', 'source'])
+    
     st.write(df)
     
     if st.sidebar.button('Run Analysis'):
@@ -58,7 +62,7 @@ if uploaded_file is not None:
         # Generate CSV for download
         csv = results.to_csv(index=False).encode()
         b64 = base64.b64encode(csv).decode()
-        st.download_button(
+        st.sidebar.download_button(
             label="Download differences as CSV",
             data=b64,
             file_name='differences.csv',
