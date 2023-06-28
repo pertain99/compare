@@ -1,8 +1,5 @@
 import streamlit as st
 import pandas as pd
-
-# The function above goes here...
-import pandas as pd
 from typing import List
 
 def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[str]) -> pd.DataFrame:
@@ -12,8 +9,7 @@ def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[
     for i in range(0, len(df), 2):  # Step by 2 to process pairs
         pair = df.iloc[i:i+2]
 
-        # Find differences for numeric and categorical data
-        diffs = {}
+        diffs = {record_id_col: pair[record_id_col].values[0]}  # Start with the record ID
         for col in pair.columns:
             if col not in ignore_cols:
                 values = pair[col].values
@@ -26,13 +22,7 @@ def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[
 
     return results
 
-
-
-
-
-
-
-st.title('CSV File Pairwise Comparison Tool Version 2')
+st.title('CSV File Pairwise Comparison Tool')
 st.write("""
 This app allows you to upload a CSV file and perform a pairwise comparison on the data.
 The data is assumed to be arranged in pairs based on the `RECORD_ID` column. The tool 
@@ -55,9 +45,11 @@ if uploaded_file is not None:
     if st.sidebar.button('Run Analysis'):
         ignore_cols = ['source']
         record_id_col = 'RECORD_ID'
-        # convert all dataframe columns to string
         df = df.astype(str)
         results = pairwise_comparison(df, record_id_col, ignore_cols)
         
+        # Drop columns where all values are N/A
+        results = results.dropna(axis=1, how='all')
+
         st.write("Differences:")
         st.write(results)
