@@ -17,7 +17,7 @@ def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[
         for col in pair.columns:
             if col not in ignore_cols:
                 values = pair[col].values
-                if pd.api.types.is_numeric_dtype(df[col]) and not isinstance(values[0], bool):
+                if pd.api.types.is_numeric_dtype(df[col]) and not isinstance(values[0], (bool, str)):
                     diffs[col] = abs(values[0] - values[1])
                 else:
                     diffs[col] = None if values[0] == values[1] else (str(values[0]) + ' -> ' + str(values[1]))
@@ -25,6 +25,7 @@ def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[
         results = results.append(diffs, ignore_index=True)
 
     return results
+
 
 
 
