@@ -26,7 +26,7 @@ st.title('CSV File Pairwise Comparison Tool')
 st.write("""
 This app allows you to upload a CSV file and perform a pairwise comparison on the data.
 The data is assumed to be arranged in pairs based on the `RECORD_ID` column. The tool 
-ignores the `source` column during the comparison.
+ignores the `source` and `RECORD_ID` columns during the comparison.
 
 After uploading your file, you can click the 'Run Analysis' button to start the comparison.
 The tool will then display a list of differences between each pair of rows.
@@ -43,7 +43,7 @@ if uploaded_file is not None:
     st.write(df)
     
     if st.sidebar.button('Run Analysis'):
-        ignore_cols = ['source']
+        ignore_cols = ['source', 'RECORD_ID']  # Ignore 'RECORD_ID' during the comparison
         record_id_col = 'RECORD_ID'
         df = df.astype(str)
         results = pairwise_comparison(df, record_id_col, ignore_cols)
