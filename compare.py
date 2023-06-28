@@ -55,6 +55,8 @@ if uploaded_file is not None:
     if st.sidebar.button('Run Analysis'):
         ignore_cols = ['source']
         record_id_col = 'RECORD_ID'
+        # convert all dataframe columns to string
+        df = df.astype(str)
         results = pairwise_comparison(df, record_id_col, ignore_cols)
         
         st.write("Differences:")
