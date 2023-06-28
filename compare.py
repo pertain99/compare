@@ -32,7 +32,7 @@ def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[
 
 
 
-st.title('CSV File Pairwise Comparison Tool')
+st.title('CSV File Pairwise Comparison Tool Version 2')
 st.write("""
 This app allows you to upload a CSV file and perform a pairwise comparison on the data.
 The data is assumed to be arranged in pairs based on the `RECORD_ID` column. The tool 
