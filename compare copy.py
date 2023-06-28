@@ -23,11 +23,22 @@ def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[
 
     return results
 
+def to_excel(df):
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, sheet_name='Sheet1')
+    writer.save()
+    processed_data = output.getvalue()
+    return processed_data
+
 def get_table_download_link(df):
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()  
-    href = f'<a href="data:file/csv;base64,{b64}" download="differences.csv">Download Differences CSV</a>'
-    return href
+    """Generates a link allowing the data in a given panda dataframe to be downloaded
+    in:  dataframe
+    out: href string
+    """
+    val = to_excel(df)
+    b64 = base64.b64encode(val)  # val looks like b'...'
+    return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="download.xlsx">Download csv file</a>'  # decode b'abc' => abc
 
 st.title('CSV File Pairwise Comparison Tool')
 st.write("""
