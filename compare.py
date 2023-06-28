@@ -6,24 +6,26 @@ import pandas as pd
 from typing import List
 
 def pairwise_comparison(df: pd.DataFrame, record_id_col: str, ignore_cols: List[str]) -> pd.DataFrame:
-    # Sort the dataframe based on the record_id_col to ensure pairs are together
     df = df.sort_values(by=[record_id_col])
-    
-    # Initialize an empty dataframe to store the results
     results = pd.DataFrame()
 
     for i in range(0, len(df), 2):  # Step by 2 to process pairs
-        # Get the pair of rows
         pair = df.iloc[i:i+2]
 
-        # Compute the difference
-        diff = pair.drop(columns=ignore_cols).diff().abs().iloc[-1]
-        diff = diff[diff != 0]  # Keep only the differences
+        # Find differences for numeric and categorical data
+        diffs = {}
+        for col in pair.columns:
+            if col not in ignore_cols:
+                values = pair[col].values
+                if pd.api.types.is_numeric_dtype(pair[col]):
+                    diffs[col] = abs(values[0] - values[1])
+                else:
+                    diffs[col] = values[0] != values[1]  # This will return a boolean value
 
-        # Append the difference to the results dataframe
-        results = results.append(diff, ignore_index=True)
-    
+        results = results.append(diffs, ignore_index=True)
+
     return results
+
 
 
 st.title('CSV File Pairwise Comparison Tool')
