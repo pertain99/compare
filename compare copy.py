@@ -49,32 +49,35 @@ for every value in the `RECORD_ID` column, there are exactly two rows.
 st.sidebar.header("Upload your CSV file")
 uploaded_file = st.sidebar.file_uploader("Choose a file", type=['csv'])
 
-if uploaded_file is not None:
+# If user does not upload file, use default file
+if uploaded_file is None:
+    df = pd.read_csv('data_2023-06-27 09_58_09 PM.csv')
+else:
     df = pd.read_csv(uploaded_file)
-    
-    # Sort by `RECORD_ID` and `source` before analysis
-    df = df.sort_values(by=['RECORD_ID', 'source'])
-    
-    st.write(df)
-    
-    if st.sidebar.button('Run Analysis'):
-        ignore_cols = ['RECORD_ID']  # Ignore 'RECORD_ID' during the comparison
-        record_id_col = 'RECORD_ID'
-        df = df.astype(str)
-        results = pairwise_comparison(df, record_id_col, ignore_cols)
-        
-        # Identify columns to drop (all N/A) except 'source'
-        cols_to_drop = results.columns[results.isna().all()].tolist()
-        if 'source' in cols_to_drop:
-            cols_to_drop.remove('source')
-        # Drop these columns
-        results = results.drop(columns=cols_to_drop)
 
-        st.write("Differences:")
-        st.write(results)
+# Sort by `RECORD_ID` and `source` before analysis
+df = df.sort_values(by=['RECORD_ID', 'source'])
 
-        # Save results to a CSV file
-        results.to_csv('results.csv', index=False)
+st.write(df)
 
-        # Provide link for download
-        st.sidebar.markdown(get_table_download_link(results), unsafe_allow_html=True)
+if st.sidebar.button('Run Analysis'):
+    ignore_cols = ['RECORD_ID']  # Ignore 'RECORD_ID' during the comparison
+    record_id_col = 'RECORD_ID'
+    df = df.astype(str)
+    results = pairwise_comparison(df, record_id_col, ignore_cols)
+
+    # Identify columns to drop (all N/A) except 'source'
+    cols_to_drop = results.columns[results.isna().all()].tolist()
+    if 'source' in cols_to_drop:
+        cols_to_drop.remove('source')
+    # Drop these columns
+    results = results.drop(columns=cols_to_drop)
+
+    st.write("Differences:")
+    st.write(results)
+
+    # Save results to a CSV file
+    results.to_csv('results.csv', index=False)
+
+    # Provide link for download
+    st.sidebar.markdown(get_table_download_link(results), unsafe_allow_html=True)
